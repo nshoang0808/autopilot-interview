@@ -159,11 +159,11 @@ run = [
 ]
 
 [tools]
-go = "1.25.0"
-node = "24.5.0"
+go = "1.25.3"
+node = "24.11.1"
 watchexec = "2.3.2"
 "aqua:aws/aws-cli" = "2.27.37"
-"aqua:golangci/golangci-lint" = "2.1.6"
+"aqua:golangci/golangci-lint" = "2.5.0"
 "aqua:gotestyourself/gotestsum" = "1.12.2"
 "aqua:pnpm/pnpm" = "10.15.0"
 "aqua:vektra/mockery" = "3.4.0"

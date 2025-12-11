@@ -13,12 +13,12 @@
 		"*.css": "tailwindcss"
 	},
 	"go.alternateTools": {
-		"customFormatter": "~/.local/share/mise/installs/aqua-golangci-golangci-lint/2.1.6/golangci-lint-2.1.6-darwin-arm64/golangci-lint",
-		"golangci-lint-v2": "~/.local/share/mise/installs/aqua-golangci-golangci-lint/2.1.6/golangci-lint-2.1.6-darwin-arm64/golangci-lint"
+		"customFormatter": "~/.local/share/mise/installs/aqua-golangci-golangci-lint/2.5.0/golangci-lint-2.5.0-darwin-arm64/golangci-lint",
+		"golangci-lint-v2": "~/.local/share/mise/installs/aqua-golangci-golangci-lint/2.5.0/golangci-lint-2.5.0-darwin-arm64/golangci-lint"
 	},
 	"go.formatFlags": ["fmt", "--stdin"],
 	"go.formatTool": "custom",
-	"go.goroot": "${env:HOME}/.local/share/mise/installs/go/1.25.0",
+	"go.goroot": "${env:HOME}/.local/share/mise/installs/go/1.25.3",
 	"go.lintFlags": [
 		"run",
 		"--config=${workspaceFolder}/.golangci.yaml",
