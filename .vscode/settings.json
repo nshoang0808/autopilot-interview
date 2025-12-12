@@ -1,10 +1,10 @@
 {
 	"editor.codeActionsOnSave": {
 		"source.organizeImports.biome": "explicit",
-    "source.removeUnusedImports": "explicit"
+		"source.removeUnusedImports": "explicit"
 	},
 	"editor.defaultFormatter": "biomejs.biome",
-  "editor.formatOnSave": true,
+	"editor.formatOnSave": true,
 	"editor.quickSuggestions": {
 		"strings": "on"
 	},
@@ -12,27 +12,9 @@
 	"files.associations": {
 		"*.css": "tailwindcss"
 	},
-	"go.alternateTools": {
-		"customFormatter": "~/.local/share/mise/installs/aqua-golangci-golangci-lint/2.5.0/golangci-lint-2.5.0-darwin-arm64/golangci-lint",
-		"golangci-lint-v2": "~/.local/share/mise/installs/aqua-golangci-golangci-lint/2.5.0/golangci-lint-2.5.0-darwin-arm64/golangci-lint"
-	},
-	"go.formatFlags": ["fmt", "--stdin"],
-	"go.formatTool": "custom",
-	"go.goroot": "${env:HOME}/.local/share/mise/installs/go/1.25.3",
-	"go.lintFlags": [
-		"run",
-		"--config=${workspaceFolder}/.golangci.yaml",
-		"--issues-exit-code=0",
-		"--output.text.print-issued-lines=true",
-		"--output.text.colors=true"
-	],
-	"go.lintTool": "golangci-lint-v2",
-	"go.useLanguageServer": true,
 	"javascript.format.enable": false,
 	"javascript.preferences.importModuleSpecifier": "non-relative",
+	"typescript.experimental.useTsgo": true,
 	"typescript.format.enable": false,
-	"typescript.preferences.importModuleSpecifier": "non-relative",
-	"[go]": {
-		"editor.defaultFormatter": "golang.go"
-	}
+	"typescript.preferences.importModuleSpecifier": "non-relative"
 }

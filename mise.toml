@@ -1,169 +1,72 @@
-[env]
-FORCE_COLOR = 1
-MISE_GITHUB_TOKEN = "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"
-NODE_OPTIONS = "--no-warnings"
-
 [settings]
 quiet = true
 
 [tasks.api]
-description = "Run the CLI for API gateway"
-run = ["go run ./backends/api"]
+description = "Run the API CLI"
+dir = "./api"
+run = "node --import=tsx ./main.ts"
 
 [tasks.check]
 description = "Run all code checks"
-depends = ["check:apps", "check:packages", "check:backends", "check:biome"]
-
-[tasks."check:apps"]
-hide = true
-run = ["pnpm -F ./apps/dashboard typecheck"]
-
-[tasks."check:packages"]
-hide = true
-run = ["pnpm -F ./packages/api typecheck", "pnpm -F ./packages/ui typecheck"]
-
-[tasks."check:backends"]
-hide = true
-run = ["go vet ./...", "golangci-lint fmt", "golangci-lint run"]
+depends = ["check:biome", "tsc api", "tsc dashboard"]
 
 [tasks."check:biome"]
 hide = true
-run = ["if [ -z \"$CI\" ]; then pnpm biome check --diagnostic-level=warn --write --unsafe .; else pnpm biome check --diagnostic-level=warn .; fi"]
+run = "bun biome check --diagnostic-level=warn --write --unsafe ."
+
+[tasks.tsc]
+description = "Run type checks"
+usage = 'arg "<pkg>"'
+run = '''
+cd "./${usage_pkg?}"
+if [ -f react-router.config.ts ]; then bun react-router typegen; fi
+bun tsgo
+'''
+
+[tasks.dev]
+description = "Start API and dashboard in watch mode"
+depends = ["dev:node api", "dev:vite dashboard"]
+
+[tasks."dev:node"]
+hide = true
+usage = 'arg "<svc>"'
+run = '''
+cd "./${usage_svc?}"
+node --import=tsx --watch-kill-signal=SIGKILL --watch-path=./{commands,databases,lib,primitives,routes,services,trpc} --watch-preserve-output ./main.ts start
+'''
+
+[tasks."dev:vite"]
+hide = true
+usage = 'arg "<pkg>"'
+run = '''
+cd "./${usage_pkg?}"
+if [ -f react-router.config.ts ]; then bun react-router dev; fi
+'''
+
+[tasks.test]
+description = "Run tests"
+run = "bun vitest run"
 
 [tasks.clean]
 description = "Clean the project"
-run = ["rm -rf node_modules **/{,/**/}*.log **/{,/**/}{build,node_modules,.react-router,tsconfig.tsbuildinfo} test-results playwright-report blob-report"]
-
-[tasks.dev]
-description = "Run the development servers and workers"
-depends = ["dev:api", "dev:assets", "dev:dashboard", "dev:openapi"]
-
-[tasks."dev:api"]
-hide = true
-run = ["mise watch --watch=./backends/api --watch=./backends/internal --stop-signal=SIGKILL --stop-timeout=0 --restart api start --worker"]
-
-[tasks."dev:assets"]
-hide = true
-run = ["pnpm --silent -F ./apps/assets dev"]
-
-[tasks."dev:dashboard"]
-hide = true
-run = ["pnpm --silent -F ./apps/dashboard dev"]
-
-[tasks."dev:openapi"]
-hide = true
-run = ["mise watch --filter=main.go --filter=**/handler/**/*.go --watch=./backends/api gen:openapi"]
-
-[tasks.domains]
-description = "Show domains for all services"
-run = ["""
-echo "";
-echo "📱 Frontend Apps";
-echo "   • Dashboard          http://localhost:3000";
-echo "   • Mailer Preview     http://localhost:3001/mailer/preview";
-echo "   • Queue UI           http://localhost:3001/queue";
-echo "";
-echo "🔧 Backend Services";
-echo "   • API                http://localhost:3001";
-echo "";
-echo "🛠️  Infrastructure";
-echo "   • Postgres           localhost:5432";
-echo "   • Postgres UI        http://localhost:8081";
-echo "   • Redis              localhost:6379";
-echo "   • Mailpit            http://localhost:8025";
-echo "   • MinIO              http://localhost:9000";
-echo "   • MinIO Admin        http://localhost:9001";
-echo "";
-"""]
+run = "rm -rf node_modules dashboard/node_modules **/*.log"
 
 [tasks.down]
-description = "Teardown the development environment"
-run = ["docker compose --profile=infra down --remove-orphans --timeout 0"]
+description = "Stop all services"
+run = "docker compose down --remove-orphans --timeout 0"
 
-[tasks.gen]
-description = "Generate code"
-depends = ["gen:apps", "gen:packages", "gen:backends", "gen:openapi"]
-
-[tasks."gen:apps"]
-hide = true
-run = ["pnpm --silent -F ./apps/dashboard typegen"]
-
-[tasks."gen:packages"]
-hide = true
-run = [
-  "pnpm --silent -F ./packages/api typegen",
-  "pnpm --silent -F ./packages/ui typegen"
-]
-
-[tasks."gen:backends"]
-hide = true
-run = ["go generate -x ./...", "mockery --config=.mockery.yaml --log-level=error"]
-
-[tasks."gen:openapi"]
-description = "Generate OpenAPI spec and Typescript client"
-run = [
-  "mise api gen:openapi",
-  "pnpm --silent -F ./packages/api gen",
-]
-
-[tasks."commit-msg"]
-description = "Run commit-msg hooks"
-run = ["pnpm commitlint --edit $1"]
-
-[tasks."pre-commit"]
-description = "Run pre-commit hooks"
-run = [
-  "mise run gen",
-  "mise run check",
-  "git diff --exit-code"
-]
-
-[tasks.preview]
-description = "Preview the application in Docker Compose"
-run = ["docker compose --profile=app up --build", "docker compose --profile=app down"]
+[tasks.up]
+description = "Start services and setup database"
+run = ["docker compose up -d --wait", "mise api db:migrate", "mise api db:seed"]
 
 [tasks.reset]
-description = "Reset the development environment"
+description = "Reset development environment"
 run = ["mise down", "mise run up"]
 
 [tasks.setup]
 description = "Setup the project"
-run = [
-  "go mod download",
-  "pnpm i",
-  "mkdir -p .git/hooks",
-  "mise generate git-pre-commit --write --task=pre-commit",
-  "echo '#!/bin/sh\nexec mise run commit-msg \"$1\"' > .git/hooks/commit-msg && chmod +x .git/hooks/commit-msg",
-]
-
-[tasks.test]
-description = "Run all tests"
-depends = ["test:backends"]
-
-[tasks."test:backends"]
-hide = true
-depends = ["gen:backends"]
-run = ["gotestsum --format=testdox -- -count=1 -race -v ./..."]
-
-[tasks.up]
-description = "Setup the development environment"
-run = [
-  "docker compose --profile=infra up --wait",
-  "docker compose --profile=infra stop db-ui",
-  "docker compose exec -it cache /bin/bash -c 'printf \"yes\\nyes\\n\" | valkey-cli --cluster create cache:6379 cache-node-2:6379 --cluster-replicas 0'",
-  "mise api db:migrate",
-  "mise api db:seed",
-  "docker compose --profile=infra start db-ui",
-  "docker compose exec -it storage /bin/bash -c 'mc alias set local http://localhost:9000 minioadmin minioadmin'",
-  "docker compose exec -it storage /bin/bash -c 'for bucket in autopilot-development-identity autopilot-development-payment autopilot-development-payout; do mc mb local/$bucket; done'"
-]
+run = ["bun i --frozen-lockfile"]
 
 [tools]
-go = "1.25.3"
+bun = "1.3.4"
 node = "24.11.1"
-watchexec = "2.3.2"
-"aqua:aws/aws-cli" = "2.27.37"
-"aqua:golangci/golangci-lint" = "2.5.0"
-"aqua:gotestyourself/gotestsum" = "1.12.2"
-"aqua:pnpm/pnpm" = "10.15.0"
-"aqua:vektra/mockery" = "3.4.0"

@@ -3,14 +3,14 @@
 	"files": {
 		"ignoreUnknown": true,
 		"includes": [
-			"apps/**/*.{json,md,toml,ts,tsx,yaml,yml,astro}",
-			"packages/**/*.{json,md,toml,ts,tsx,yaml,yml}",
-			".github/**/*.{json,md,toml,yaml,yml}",
-			"!apps/checkout/.react-router/**/*",
-			"!apps/dashboard/.react-router/**/*",
-			"!apps/www/.astro/**/*",
-			"!packages/api/src/contracts/**/*",
-			"!packages/ui/src/components/ap-icons/*"
+			"**/*.{json,md,toml,mjs,ts,tsx,yaml,yml}",
+			"!**/{.astro,.react-router}/**/*",
+			"!**/build/**/*",
+			"!**/databases/**/{data,schema}_migrations/**/*",
+			"!**/public/openapi/*.json",
+			"!**/secure/**/*.v*.json",
+			"!node_modules",
+			"!package.json"
 		]
 	},
 	"vcs": {
@@ -28,9 +28,12 @@
 			},
 			"correctness": {
 				"noEmptyPattern": "off",
+				"noUnusedPrivateClassMembers": "off",
 				"noUnusedFunctionParameters": "off",
-				"noUnusedVariables": "off",
-				"useUniqueElementIds": "off"
+				"noUnusedVariables": "off"
+			},
+			"style": {
+				"noNonNullAssertion": "off"
 			},
 			"suspicious": {
 				"noExplicitAny": "off"

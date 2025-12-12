@@ -5,12 +5,9 @@
 		"eamodio.gitlens",
 		"editorconfig.editorconfig",
 		"github.vscode-github-actions",
-		"golang.go",
 		"ms-azuretools.vscode-docker",
 		"mtxr.sqltools",
 		"redhat.vscode-yaml",
-		"unifiedjs.vscode-mdx",
-		"1password.op-vscode",
-		"4ops.terraform"
+		"unifiedjs.vscode-mdx"
 	]
 }
