@@ -1,7 +1,14 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { getPaymentById } from "#api/services/payments.ts";
+import { getPaymentById, createPayment } from "#api/services/payments.ts";
 import { protectedProcedure, router } from "./init.ts";
+
+const CreatePaymentRequestSchema = z.object({
+  amount: z.number().int().positive(),
+  currency: z.string().optional(),
+  method: z.enum(["card", "bank_transfer"]),
+  description: z.string().nullable().optional(),
+});
 
 /**
  * Payments router for dashboard internal use.
@@ -33,4 +40,17 @@ export const paymentsRouter = router({
 
 			return payment;
 		}),
+
+  create: protectedProcedure
+    .input(CreatePaymentRequestSchema)
+    .mutation(async ({ ctx, input }) => {
+      const payment = await createPayment(ctx, {
+        userId: ctx.user.id,
+        amount: input.amount,
+        currency: input.currency,
+        method: input.method,
+        description: input.description,
+      });
+      return payment;
+    })
 });

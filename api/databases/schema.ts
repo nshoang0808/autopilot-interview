@@ -139,6 +139,12 @@ export const paymentStatuses = [
 export type PaymentStatus = (typeof paymentStatuses)[number];
 
 /**
+ * Payment method enum values.
+ */
+export const paymentMethods = ["card", "bank_transfer"] as const;
+export type PaymentMethod = (typeof paymentMethods)[number];
+
+/**
  * Payments table - the main table candidates will work with.
  */
 export const payments = pgTable(
@@ -147,6 +153,10 @@ export const payments = pgTable(
 		id: t.text("id").primaryKey().default(sql`uuidv7()`),
 		amount: t.integer("amount").notNull(),
 		currency: t.text("currency").notNull().default("USD"),
+		method: t
+      .text("method")
+      .default("card")
+      .$type<PaymentMethod>(),
 		status: t
 			.text("status")
 			.notNull()
