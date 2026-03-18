@@ -1,4 +1,5 @@
 import { PaymentCreationForm } from "#dashboard/app/routes/_app+/payments/PaymentCreationForm.tsx";
+import { PaymentsTable } from "#dashboard/app/routes/_app+/payments/PaymentsTable.tsx";
 
 /**
  * Payments page component.
@@ -60,9 +61,9 @@ export default function PaymentsPage() {
 			{/* TODO: Add payments table */}
 			<div className="rounded-lg border bg-white p-6">
 				<h2 className="text-lg font-medium">Payment History</h2>
-				<p className="mt-2 text-sm text-gray-500">
-					Implement the payments table here
-				</p>
+				<div className="mt-4">
+					<PaymentsTable />
+				</div>
 				{/* Table goes here */}
 			</div>
 		</div>

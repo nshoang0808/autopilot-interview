@@ -1,16 +1,15 @@
 import { useState } from "react";
-import { trpc } from "#dashboard/app/lib/trpc.tsx";
 import { Button } from "#assets/components/ui/button.tsx";
+import { trpc } from "#dashboard/app/lib/trpc.tsx";
 
 export enum PaymentMethod {
-  Card = "card",
-  BankTransfer = "bank_transfer",
+	Card = "card",
+	BankTransfer = "bank_transfer",
 }
 
 export function PaymentCreationForm() {
 	const utils = trpc.useUtils();
 
-	const { data: payments, isLoading } = trpc.payments.listByUser.useQuery();
 	const [amount, setAmount] = useState("0");
 	const [currency, setCurrency] = useState("USD");
 	const [method, setMethod] = useState("");
@@ -19,8 +18,8 @@ export function PaymentCreationForm() {
 		onSuccess: () => {
 			utils.payments.listByUser.invalidate();
 			setAmount("0");
-      setCurrency("USD");
-      setMethod("");
+			setCurrency("USD");
+			setMethod("");
 		},
 	});
 
@@ -35,7 +34,7 @@ export function PaymentCreationForm() {
 		createMutation.mutate({
 			amount: Math.round(parsedAmount * 100),
 			currency,
-      method: PaymentMethod.Card,
+			method: PaymentMethod.Card,
 		});
 	};
 
@@ -88,12 +87,9 @@ export function PaymentCreationForm() {
 				</Button>
 
 				{createMutation.error ? (
-					<p className="text-sm text-red-600">
-						{createMutation.error.message}
-					</p>
+					<p className="text-sm text-red-600">{createMutation.error.message}</p>
 				) : null}
 			</form>
 		</div>
 	);
 }
-
