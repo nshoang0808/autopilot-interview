@@ -7,6 +7,21 @@ import type { Container } from "#api/primitives/container.ts";
 import { loadAndRegisterAPIRoutes } from "#api/primitives/openapi.ts";
 import { appRouter } from "#api/trpc/index.ts";
 
+let backgroundLoopStarted = false;
+
+function startBackgroundLoop(container: Container) {
+	if (backgroundLoopStarted) return;
+	backgroundLoopStarted = true;
+
+	const loop = () => {
+		const delay = 3000 + Math.floor(Math.random() * 2000);
+		setTimeout(() => {
+			loop();
+		}, delay);
+	};
+	loop();
+}
+
 /**
  * Raw body middleware for webhook signature verification.
  */
@@ -108,5 +123,6 @@ export async function createServer(container: Container): Promise<void> {
 	const { HOST, PORT } = container.config;
 	app.listen(PORT, HOST, () => {
 		container.logger.info(`Server running at http://${HOST}:${PORT}`);
+		startBackgroundLoop(container);
 	});
 }

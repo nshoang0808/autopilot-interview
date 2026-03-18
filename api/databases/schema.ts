@@ -134,6 +134,7 @@ export const paymentStatuses = [
 	"pending",
 	"processing",
 	"completed",
+	"settled",
 	"failed",
 ] as const;
 export type PaymentStatus = (typeof paymentStatuses)[number];
