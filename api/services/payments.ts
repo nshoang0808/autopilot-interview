@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { payments, users } from "#api/databases/schema.ts";
 import type { AppContext } from "#api/primitives/app-context.ts";
 
@@ -54,4 +54,17 @@ export async function createPayment(ctx: AppContext, input: CreatePaymentInput) 
 		.returning();
 
 	return payment;
+}
+
+/**
+ * Get all payments created by a specific user.
+ */
+export async function getPaymentsByUser(ctx: AppContext, userId: string) {
+	const userPayments = await ctx.container.db
+		.select()
+		.from(payments)
+		.where(eq(payments.createdBy, userId))
+		.orderBy(desc(payments.updatedAt));
+
+	return userPayments;
 }
