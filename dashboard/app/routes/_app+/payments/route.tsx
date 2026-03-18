@@ -1,3 +1,5 @@
+import { PaymentCreationForm } from "#dashboard/app/routes/_app+/payments/PaymentCreationForm.tsx";
+
 /**
  * Payments page component.
  *
@@ -50,10 +52,9 @@ export default function PaymentsPage() {
 			{/* TODO: Add create payment form */}
 			<div className="rounded-lg border bg-white p-6">
 				<h2 className="text-lg font-medium">Create Payment</h2>
-				<p className="mt-2 text-sm text-gray-500">
-					Implement the payment creation form here
-				</p>
-				{/* Form goes here */}
+				<div className="mt-4">
+					<PaymentCreationForm />
+				</div>
 			</div>
 
 			{/* TODO: Add payments table */}
