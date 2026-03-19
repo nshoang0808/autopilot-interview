@@ -1,13 +1,19 @@
 import { TRPCError } from "@trpc/server";
+import { observable } from "@trpc/server/observable";
 import { z } from "zod";
-import { getPaymentById, createPayment, getPaymentsByUser } from "#api/services/payments.ts";
-import { protectedProcedure, router } from "./init.ts";
+import {
+	createPayment,
+	getPaymentById,
+	getPaymentsByUser,
+} from "#api/services/payments.ts";
+import { ee } from "#api/trpc/init.ts";
+import { protectedProcedure, publicProcedure, router } from "./init.ts";
 
 const CreatePaymentRequestSchema = z.object({
-  amount: z.number().int().positive(),
-  currency: z.string().optional(),
-  method: z.enum(["card", "bank_transfer"]),
-  description: z.string().nullable().optional(),
+	amount: z.number().int().positive(),
+	currency: z.string().optional(),
+	method: z.enum(["card", "bank_transfer"]),
+	description: z.string().nullable().optional(),
 });
 
 /**
@@ -43,23 +49,33 @@ export const paymentsRouter = router({
 	/**
 	 * List payments by user.
 	 */
-	listByUser: protectedProcedure
-		.query(async ({ ctx }) => {
-      const userId = ctx.user.id;
-			return await getPaymentsByUser(ctx, userId);
+	listByUser: protectedProcedure.query(async ({ ctx }) => {
+		const userId = ctx.user.id;
+		return await getPaymentsByUser(ctx, userId);
+	}),
+
+	create: protectedProcedure
+		.input(CreatePaymentRequestSchema)
+		.mutation(async ({ ctx, input }) => {
+			const payment = await createPayment(ctx, {
+				userId: ctx.user.id,
+				amount: input.amount,
+				currency: input.currency,
+				method: input.method,
+				description: input.description,
+			});
+			return payment;
 		}),
 
-  create: protectedProcedure
-    .input(CreatePaymentRequestSchema)
-    .mutation(async ({ ctx, input }) => {
-      const payment = await createPayment(ctx, {
-        userId: ctx.user.id,
-        amount: input.amount,
-        currency: input.currency,
-        method: input.method,
-        description: input.description,
-      });
-      return payment;
-    })
-
+	/**
+	 * Scheduler to resolve payments
+	 */
+	onPaymentResolved: publicProcedure.subscription(() => {
+		return observable<any>((emit) => {
+			const onPaymentResolved = (payment: any) => {
+				emit.next(payment);
+			};
+			ee.on("paymentResolved", onPaymentResolved);
+		});
+	}),
 });

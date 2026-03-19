@@ -1,3 +1,4 @@
+import EventEmitter from "node:events";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import type { AppContext } from "#api/primitives/app-context.ts";
@@ -17,6 +18,7 @@ const t = initTRPC.context<AppContext>().create({
  */
 export const router = t.router;
 export const middleware = t.middleware;
+export const ee = new EventEmitter();
 
 /**
  * Public (unauthenticated) procedure.

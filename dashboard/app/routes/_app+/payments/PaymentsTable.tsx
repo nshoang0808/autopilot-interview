@@ -1,7 +1,28 @@
 import { trpc } from "#dashboard/app/lib/trpc.tsx";
 
+type Payment = {
+	id: string;
+	amount: number;
+	currency: string;
+	method: string;
+	status: string;
+};
+
 export function PaymentsTable() {
+	const utils = trpc.useUtils();
 	const { data: payments, isLoading } = trpc.payments.listByUser.useQuery();
+	trpc.payments.onPaymentResolved.useSubscription(undefined, {
+		onData: (payment) => {
+			utils.payments.listByUser.setData(undefined, (old) => {
+				if (!old) return old;
+				console.log("payment update incoming:", old);
+				return old.map((p) => (p.id === payment.id ? payment : p));
+			});
+		},
+		onError: (err) => {
+			console.error("Payment notification error:", err);
+		},
+	});
 
 	return (
 		<div>

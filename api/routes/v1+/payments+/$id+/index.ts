@@ -9,7 +9,7 @@ const PaymentSchema = z.object({
 	id: z.string(),
 	amount: z.number(),
 	currency: z.string(),
-	status: z.enum(["pending", "processing", "completed", "failed"]),
+	status: z.enum(["pending", "processing", "completed", "settled", "failed"]),
 	recipientEmail: z.string().email(),
 	description: z.string().nullable(),
 	createdAt: z.string(),
